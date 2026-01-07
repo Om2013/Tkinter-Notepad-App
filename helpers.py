@@ -1,7 +1,7 @@
-# helpers.py
 import os
 import tkinter as tk
 from tkinter import filedialog, messagebox, font
+from sounds import Sounds_Class   # import sounds class
 
 class Helpers_Class:
     def __init__(self, root, text, current_file=None, sounds=None, status_var=None):
@@ -40,6 +40,7 @@ class Helpers_Class:
 
     # ---------------- File Functions ----------------
     def new_file(self):
+        if self.sounds: self.sounds.click.play()
         if self.text.get('1.0', 'end-1c').strip():
             if not messagebox.askyesno("Confirm", "Unsaved changes will be lost. Continue?"):
                 return
@@ -47,10 +48,10 @@ class Helpers_Class:
         self.current_file = None
         if self.status_var:
             self.status_var.set("New file created")
-        if self.sounds:
-            self.sounds.play('new')
+        if self.sounds: self.sounds.new.play()
 
     def open_file(self):
+        if self.sounds: self.sounds.click.play()
         file_path = filedialog.askopenfilename(filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")])
         if file_path:
             try:
@@ -61,18 +62,20 @@ class Helpers_Class:
                 self.current_file = file_path
                 if self.status_var:
                     self.status_var.set(f"Opened: {os.path.basename(file_path)}")
-                if self.sounds:
-                    self.sounds.play('open')
+                if self.sounds: self.sounds.open.play()
             except Exception as e:
+                if self.sounds: self.sounds.error.play()
                 messagebox.showerror("Error", f"Could not open file:\n{e}")
 
     def save_file(self):
+        if self.sounds: self.sounds.click.play()
         if self.current_file:
             self._write_file(self.current_file)
         else:
             self.save_as_file()
 
     def save_as_file(self):
+        if self.sounds: self.sounds.click.play()
         file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")])
         if file_path:
             self.current_file = file_path
@@ -85,19 +88,22 @@ class Helpers_Class:
                 f.write(content)
             if self.status_var:
                 self.status_var.set(f"Saved: {os.path.basename(file_path)}")
-            if self.sounds:
-                self.sounds.play('save')
+            if self.sounds: self.sounds.save.play()
         except Exception as e:
+            if self.sounds: self.sounds.error.play()
             messagebox.showerror("Error", f"Could not save file:\n{e}")
 
     def quit_app(self):
+        if self.sounds: self.sounds.click.play()
         if self.text.get('1.0', 'end-1c').strip():
             if not messagebox.askyesno("Confirm", "Unsaved changes will be lost. Quit?"):
                 return
         self.root.destroy()
 
-    # ---------------- Formatting Functions ----------------
+    # ---------------- Formatting ----------------
     def toggle_style(self, style, apply_to_all=False):
+        if self.sounds: self.sounds.click.play()
+
         if apply_to_all:
             start = '1.0'
             end = 'end'
@@ -106,9 +112,8 @@ class Helpers_Class:
                 start = self.text.index("sel.first")
                 end = self.text.index("sel.last")
             except tk.TclError:
-                return  # no selection
+                return
 
-        # Toggle style
         ranges = self.text.tag_ranges(style)
         fully_applied = False
         if ranges:
