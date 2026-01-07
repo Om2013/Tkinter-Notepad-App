@@ -1,4 +1,3 @@
-sounds.py
 import pygame
 
 class Sounds_Class:
